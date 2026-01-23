@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Development",
+    "apps": [
+      {
+        "name": "Front-end",
+        "url": "https://codesamples.net",
+        "status": "down"
+      }
+    ]
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Developmental",
+    "apps": [
+      {
+        "name": "Front-end",
+        "url": "https://codesamples.net",
+        "status": "down"
+      },
+      {
+        "name": "localhost",
+        "url": "http://localhost:8080",
+        "status": "down"
+      }
+    ]
+  }
+]
