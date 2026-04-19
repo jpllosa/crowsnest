@@ -30,7 +30,8 @@ public class ScheduledPings {
     @Autowired
     SimpMessagingTemplate simpMessagingTemplate;
 
-    private WebClient webClient = WebClient.create();
+    @Autowired
+    private WebClient webClient;
 
     private List<Environment> internalEnvironmentList = new ArrayList<>();
 
