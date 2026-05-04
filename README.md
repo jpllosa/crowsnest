@@ -8,6 +8,7 @@ Demo project for the following:
 2. [Spring SimpMessagingTemplate Example](https://codesamples.net/2026/02/spring-simpmessagingtemplate-example/)
 3. [Dockerize Spring Boot App Example](https://codesamples.net/2026/02/dockerize-spring-boot-app-example/)
 4. [Deploy to Kubernetes Example](https://codesamples.net/2026/03/deploy-to-kubernetes-example/)
+5. [Spring WebClient Failed to Resolve Example](https://codesamples.net/2026/04/spring-webclient-failed-to-resolve-example/)
 
 Check out:
  - [codesamples.net](https://codesamples.net/)
