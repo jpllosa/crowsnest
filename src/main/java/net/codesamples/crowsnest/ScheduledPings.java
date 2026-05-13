@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,6 +34,21 @@ public class ScheduledPings {
     @Autowired
     private WebClient webClient;
 
+    @Autowired
+    private EmailService emailService;
+
+    @Value("${email.recipients}")
+    private List<String> emailRecipients;
+
+    @Value("${email.feature.enabled}")
+    private boolean emailFeatureEnabled;
+
+    @Value("${awry.payloads}")
+    private List<String> awryPayloads;
+
+    @Value("${awry.payload.feature.enabled}")
+    private boolean awryPayloadFeatureEnabled;
+
     private List<Environment> internalEnvironmentList = new ArrayList<>();
 
     private ObjectMapper mapper = new ObjectMapper();
@@ -58,9 +74,20 @@ public class ScheduledPings {
                         .onErrorResume(Exception.class, exception -> {
                             log.info("Exception {}", exception.getMessage());
                             app.setStatus("down");
+
+                            sendEmailMessage("Monitored Service UNREACHABLE - " + app.getName(),
+                                    app.getUrl() + "\r\n" + exception.getMessage());
+
                             return Mono.empty();
                         });
-                mono.subscribe();
+                mono.subscribe(body -> {
+                    if (hasAwryPayloads(body)) {
+                        app.setStatus("down");
+                        sendEmailMessage("Monitored Service Gone AWRY? - " + app.getName(),
+                            app.getUrl() + "\r\n" +
+                            "Payload: \r\n" + body);
+                    }
+                });
             }
         }
 
@@ -75,6 +102,34 @@ public class ScheduledPings {
                 simpMessagingTemplate.convertAndSend("/topic/environments", internalEnvironmentList);
             } else {
                 log.info("environmentList equal to internalEnvironmentList");
+            }
+        }
+    }
+
+    private boolean hasAwryPayloads(String body) {
+        if (awryPayloadFeatureEnabled) {
+            if (body.isBlank() || body.length() < 9) {
+                return true;
+            }
+
+            for (String awryPayload : awryPayloads) {
+                if (body.toLowerCase().startsWith(awryPayload.toLowerCase())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void sendEmailMessage(String subject, String text) {
+        if (emailFeatureEnabled) {
+            for (String emailRecipient : emailRecipients) {
+                // Rnwood.smtp4dev
+                emailService.sendEmailMessage(
+                        emailRecipient,
+                        subject,
+                        text);
             }
         }
     }
