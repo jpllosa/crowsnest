@@ -68,6 +68,8 @@ function showEnvironments(environments) {
                     + "<p><span class=\"label label-danger\">" + app.name
                     + "</span> <span class=\"glyphicon glyphicon-thumbs-down\" aria-hidden=\"true\"></span> "
                     + "<a href=\"" + app.url + "\">" + app.url + "</a>"
+                    + "</p><p>"
+                    + "<strong>HINT:</strong> " + app.hint
                     + "</p></div>";
 
                 body = body + alert;

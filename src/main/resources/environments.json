@@ -5,12 +5,16 @@
       {
         "name": "Front-end",
         "url": "https://codesamples.net",
-        "status": "down"
+        "status": "down",
+        "hint": "Raise an IT support ticket",
+        "awryPayload": ""
       },
       {
         "name": "localhost",
         "url": "http://localhost:8080",
-        "status": "down"
+        "status": "down",
+        "hint": "Check the logs",
+        "awryPayload": "maintenance-mode"
       }
     ]
   }

@@ -8,6 +8,10 @@ public class App {
 
     private String status;
 
+    private String hint;
+
+    private String awryPayload;
+
     public App() {}
 
     public App(String name, String url) {
@@ -39,12 +43,30 @@ public class App {
         this.status = status;
     }
 
+    public String getHint() {
+        return hint;
+    }
+
+    public void setHint(String hint) {
+        this.hint = hint;
+    }
+
+    public String getAwryPayload() {
+        return awryPayload;
+    }
+
+    public void setAwryPayload(String awryPayload) {
+        this.awryPayload = awryPayload;
+    }
+
     @Override
     public String toString() {
         return "App{" +
                 "name='" + name + '\'' +
                 ", url='" + url + '\'' +
                 ", status='" + status + '\'' +
+                ", hint='" + hint + '\'' +
+                ", awryPayload='" + awryPayload + '\'' +
                 '}';
     }
 }
