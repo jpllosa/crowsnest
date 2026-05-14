@@ -43,9 +43,6 @@ public class ScheduledPings {
     @Value("${email.feature.enabled}")
     private boolean emailFeatureEnabled;
 
-    @Value("${awry.payloads}")
-    private List<String> awryPayloads;
-
     @Value("${awry.payload.feature.enabled}")
     private boolean awryPayloadFeatureEnabled;
 
@@ -65,7 +62,7 @@ public class ScheduledPings {
                         .uri(app.getUrl())
                         .exchangeToMono(clientResponse -> {
                             HttpStatusCode statusCode = clientResponse.statusCode();
-                            if (statusCode.is2xxSuccessful()) {
+                            if (statusCode.is2xxSuccessful() || statusCode.is3xxRedirection()) {
                                 app.setStatus("up");
                             }
                             log.info("StatusCode: {} = {}", statusCode, app.getUrl());
@@ -76,15 +73,17 @@ public class ScheduledPings {
                             app.setStatus("down");
 
                             sendEmailMessage("Monitored Service UNREACHABLE - " + app.getName(),
-                                    app.getUrl() + "\r\n" + exception.getMessage());
+                                    app.getUrl() + "\r\n" + exception.getMessage() +"\r\n" +
+                                    "Troubleshooting HINT: " + app.getHint());
 
                             return Mono.empty();
                         });
                 mono.subscribe(body -> {
-                    if (hasAwryPayloads(body)) {
+                    if (hasAwryPayloads(body, app.getAwryPayload())) {
                         app.setStatus("down");
                         sendEmailMessage("Monitored Service Gone AWRY? - " + app.getName(),
-                            app.getUrl() + "\r\n" +
+                        app.getUrl() + "\r\n" +
+                            "Troubleshooting HINT: " + app.getHint() + "\r\n" +
                             "Payload: \r\n" + body);
                     }
                 });
@@ -106,17 +105,9 @@ public class ScheduledPings {
         }
     }
 
-    private boolean hasAwryPayloads(String body) {
+    private boolean hasAwryPayloads(String body, String awryPayload) {
         if (awryPayloadFeatureEnabled) {
-            if (body.isBlank() || body.length() < 9) {
-                return true;
-            }
-
-            for (String awryPayload : awryPayloads) {
-                if (body.toLowerCase().startsWith(awryPayload.toLowerCase())) {
-                    return true;
-                }
-            }
+            return body.isBlank() || body.length() < 9 || body.equalsIgnoreCase(awryPayload);
         }
 
         return false;
